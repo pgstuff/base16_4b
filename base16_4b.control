@@ -1,0 +1,4 @@
+# base16_4b extension
+comment = 'Base 16 (hexadecimal) stored in 4 bytes'
+default_version = '0.0.1'
+relocatable = false

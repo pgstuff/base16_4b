@@ -1,0 +1,25 @@
+{
+    "name": "base16_4b",
+    "abstract": "Base 16 (hexadecimal) stored in 4 bytes",
+    "description": "Base 16 (hexadecimal) stored in 4 bytes data type",
+    "version": "0.0.1",
+    "maintainer": "The maintainer's name",
+    "license": "postgresql",
+    "provides": {
+        "base16_4b": {
+            "abstract": "Base 16 (hexadecimal) stored in 4 bytes data type",
+            "file": "sql/base16_4b.sql",
+            "docfile": "doc/base16_4b.md",
+            "version": "0.0.1"
+        }
+    },
+    "release_status": "unstable",
+
+    "generated_by": "The maintainer's name",
+
+
+    "meta-spec": {
+        "version": "1.0.0",
+        "url": "http://pgxn.org/meta/spec.txt"
+    }
+}

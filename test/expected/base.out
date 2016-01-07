@@ -1,0 +1,162 @@
+\set ECHO none
+CREATE TABLE base16_4bs(id serial primary key, base16_4b base16_4b unique);
+INSERT INTO base16_4bs(base16_4b) VALUES('01234567');
+INSERT INTO base16_4bs(base16_4b) VALUES('89ABCDEF');
+INSERT INTO base16_4bs(base16_4b) VALUES('20000004');
+INSERT INTO base16_4bs(base16_4b) VALUES('40000002');
+INSERT INTO base16_4bs(base16_4b) VALUES('30000003');
+INSERT INTO base16_4bs(base16_4b) VALUES('abcdef');
+INSERT INTO base16_4bs(base16_4b) VALUES('0'); -- test limits
+INSERT INTO base16_4bs(base16_4b) VALUES('FFFFFFFF');
+SELECT * FROM base16_4bs ORDER BY base16_4b;
+ id | base16_4b 
+----+-----------
+  7 | 0
+  6 | ABCDEF
+  1 | 1234567
+  3 | 20000004
+  5 | 30000003
+  4 | 40000002
+  2 | 89ABCDEF
+  8 | FFFFFFFF
+(8 rows)
+
+SELECT MIN(base16_4b) AS min FROM base16_4bs;
+ min 
+-----
+ 0
+(1 row)
+
+SELECT MAX(base16_4b) AS max FROM base16_4bs;
+   max    
+----------
+ FFFFFFFF
+(1 row)
+
+-- index scan
+TRUNCATE base16_4bs;
+INSERT INTO base16_4bs(base16_4b) SELECT '4444'||id FROM generate_series(5678, 8000) id;
+SET enable_seqscan = false;
+SELECT id,base16_4b::text FROM base16_4bs WHERE base16_4b = '44446000';
+ id  | base16_4b 
+-----+-----------
+ 331 | 44446000
+(1 row)
+
+SELECT id,base16_4b FROM base16_4bs WHERE base16_4b >= '44447000' LIMIT 5;
+  id  | base16_4b 
+------+-----------
+ 1331 | 44447000
+ 1332 | 44447001
+ 1333 | 44447002
+ 1334 | 44447003
+ 1335 | 44447004
+(5 rows)
+
+SELECT count(id) FROM base16_4bs;
+ count 
+-------
+  2323
+(1 row)
+
+SELECT count(id) FROM base16_4bs WHERE base16_4b <> ('44446500'::text)::base16_4b;
+ count 
+-------
+  2322
+(1 row)
+
+RESET enable_seqscan;
+-- operators and conversions
+SELECT '0'::base16_4b < '0'::base16_4b;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '0'::base16_4b > '0'::base16_4b;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '0'::base16_4b < '1'::base16_4b;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '0'::base16_4b > '1'::base16_4b;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '0'::base16_4b <= '0'::base16_4b;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '0'::base16_4b >= '0'::base16_4b;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '0'::base16_4b <= '1'::base16_4b;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '0'::base16_4b >= '1'::base16_4b;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '0'::base16_4b <> '0'::base16_4b;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '0'::base16_4b <> '1'::base16_4b;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '0'::base16_4b = '0'::base16_4b;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '0'::base16_4b = '1'::base16_4b;
+ ?column? 
+----------
+ f
+(1 row)
+
+-- COPY FROM/TO
+TRUNCATE base16_4bs;
+COPY base16_4bs(base16_4b) FROM STDIN;
+COPY base16_4bs TO STDOUT;
+2332	0
+2333	FFFFFFFF
+-- clean up --
+DROP TABLE base16_4bs;
+-- errors
+SELECT ''::base16_4b;
+ERROR:  base16_4b number "" must be 1 digits or larger.
+LINE 1: SELECT ''::base16_4b;
+               ^
+SELECT '123456789'::base16_4b;
+ERROR:  base16_4b number "123456789" must be 8 digits or smaller.
+LINE 1: SELECT '123456789'::base16_4b;
+               ^
+SELECT 'Z'::base16_4b;
+ERROR:  base16_4b number "Z" must only contain digits 0 to 9 and A to F.
+LINE 1: SELECT 'Z'::base16_4b;
+               ^
