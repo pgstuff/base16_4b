@@ -47,7 +47,7 @@ LANGUAGE C IMMUTABLE STRICT;
 -- to/from text conversion
 CREATE OR REPLACE FUNCTION base16_4b_to_text(base16_4b) RETURNS text AS '$libdir/base16_4b'
 LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION text_to_base16_4b(text) RETURNS base16_4b AS '$libdir/base16_4b'
+CREATE OR REPLACE FUNCTION base16_4b_from_text(text) RETURNS base16_4b AS '$libdir/base16_4b'
 LANGUAGE C IMMUTABLE STRICT;
 
 -- operators
@@ -117,7 +117,7 @@ CREATE OPERATOR CLASS base16_4b_ops DEFAULT FOR TYPE base16_4b USING btree AS
 
 -- cast from/to text
 CREATE CAST (base16_4b AS text) WITH FUNCTION base16_4b_to_text(base16_4b) AS ASSIGNMENT;
-CREATE CAST (text AS base16_4b) WITH FUNCTION text_to_base16_4b(text) AS ASSIGNMENT;
+CREATE CAST (text AS base16_4b) WITH FUNCTION base16_4b_from_text(text) AS ASSIGNMENT;
 
 /* Does this survive a pg_dump?
 CREATE CAST (int       AS base16_4b) WITHOUT FUNCTION AS ASSIGNMENT;
